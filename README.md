@@ -1,6 +1,6 @@
 # Youtube-to-mp3
 
-This is a simple python script created with the GPT-3 chatbot, it had some bugs and didn't do everything I asked for so some of the code is mine. It downloads a youtube video and converts it to mp3. It also displays a fixed-length progress bar with a percentage indicator and shows the total time taken to download the youtube video.
+This is a simple python script created with the GPT-3 chatbot, even this README file was created by it, the code had some bugs and didn't do everything I asked for so some of the code is mine. It downloads a youtube video and converts it to mp3. It also displays a fixed-length progress bar with a percentage indicator and shows the total time taken to download the youtube video.
 
 ## Requirements
 
