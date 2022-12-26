@@ -1,4 +1,4 @@
-import youtube_dl
+import yt_dlp
 import time
 import os
 import sys
@@ -16,7 +16,6 @@ except OSError:
 
 os.chdir(os.path.dirname(download_folder))
 
-# Define a custom class that extends the base YoutubeDL class and adds a progress bar
 class MyLogger(object):
     def debug(self, msg):
         pass
@@ -50,7 +49,8 @@ class ProgressBar(object):
         empty_str = self.empty_char * num_empty
         print("\r[{}{}] {}%".format(filled_str, empty_str, progress), end="")
 
-class CustomYoutubeDL(youtube_dl.YoutubeDL):
+# Define a custom class that extends the base YoutubeDL class and adds a progress bar
+class CustomYoutubeDL(yt_dlp.YoutubeDL):
     def __init__(self, *args, **kwargs):
         super(CustomYoutubeDL, self).__init__(*args, **kwargs)
         self.progress_bar = ProgressBar(100)

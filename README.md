@@ -2,13 +2,17 @@
 
 This is a simple python script created with the GPT-3 chatbot, even this README file was created by it, the code had some bugs and didn't do everything I asked for so some of the code is mine. It downloads a youtube video and converts it to mp3. It also displays a fixed-length progress bar with a percentage indicator and shows the total time taken to download the youtube video.
 
+## Updates
+Using [yt-dlp](https://github.com/yt-dlp/yt-dlp) now, that is a youtube-dl fork based on the now inactive youtube-dlc.
+
 ## Requirements
 
 * Python 3.x
 
 If you have any problem try to install what is below:
-* youtube-dl (install using pip install youtube-dl)
-* ffmpeg (install using pip install ffmpeg)
+* yt-dlp (install using `python3 -m pip install -U yt-dlp`)
+* ffmpeg (install using `pip install ffmpeg`)
+* In case there is any error related to cryptography, update it with: `python3 -m pip install -U cryptography`
 
 ## Usage:
 
