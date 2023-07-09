@@ -26,6 +26,8 @@ class MyLogger(object):
     def error(self, msg):
         print(msg)
 
+import re
+
 class ProgressBar(object):
     def __init__(self, total_length, filled_char="=", empty_char=" "):
         self.total_length = total_length
@@ -37,7 +39,11 @@ class ProgressBar(object):
         self.filled_length = 0
 
     def update(self, progress):
-        progress = float(progress.split('%')[0])
+        # Remove escape sequences using regex
+        progress = re.sub(r'\x1b[^m]*m', '', progress)
+        progress = progress.split('%')[0].strip()  # Remove '%' symbol and leading/trailing spaces
+        progress = float(progress)  # Convert the cleaned string to a float
+        
         num_filled = int(progress)
         num_empty = self.total_length - num_filled
 
