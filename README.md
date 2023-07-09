@@ -9,9 +9,27 @@ Using [yt-dlp](https://github.com/yt-dlp/yt-dlp) now, that is a youtube-dl fork 
 
 * Python 3.x
 
-If you have any problem try to install what is below:
-* yt-dlp (install using `python3 -m pip install -U yt-dlp`)
-* ffmpeg (install using `pip install ffmpeg`)
+Install requirements:
+`pip install -r requirements.txt`
+
+Also install ffmpeg
+
+For Debian-based Linux distributions:
+```
+sudo apt update
+sudo apt install ffmpeg
+```
+
+For Red Hat-based Linux distributions:
+```
+sudo yum install ffmpeg
+```
+
+For macOS (using Homebrew):
+```
+brew install ffmpeg
+```
+
 * In case there is any error related to cryptography, update it with: `python3 -m pip install -U cryptography`
 
 ## Usage:
