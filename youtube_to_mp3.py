@@ -2,19 +2,21 @@ import yt_dlp
 import time
 import os
 import sys
+import re
 
 # Get current working directory
 current_dir = os.path.dirname(os.path.abspath(__file__))
-download_folder = current_dir + '/Downloads/'
+download_folder = os.path.join(current_dir, 'Downloads')
 
+# Create Downloads folder if it doesn't exist
 try:
-        
     if not os.path.exists(download_folder):
         os.makedirs(download_folder)
-except OSError:
-    pass
+except OSError as e:
+    print(f"Error creating Downloads directory: {e}")
+    sys.exit(1)
 
-os.chdir(os.path.dirname(download_folder))
+os.chdir(current_dir)
 
 class MyLogger(object):
     def debug(self, msg):
@@ -25,8 +27,6 @@ class MyLogger(object):
 
     def error(self, msg):
         print(msg)
-
-import re
 
 class ProgressBar(object):
     def __init__(self, total_length, filled_char="=", empty_char=" "):
@@ -43,7 +43,7 @@ class ProgressBar(object):
         progress = re.sub(r'\x1b[^m]*m', '', progress)
         progress = progress.split('%')[0].strip()  # Remove '%' symbol and leading/trailing spaces
         progress = float(progress)  # Convert the cleaned string to a float
-        
+
         num_filled = int(progress)
         num_empty = self.total_length - num_filled
 
@@ -66,35 +66,86 @@ class CustomYoutubeDL(yt_dlp.YoutubeDL):
         if d["status"] == "downloading":
             self.progress_bar.update(d["_percent_str"])
 
-# Define the youtube-dl options
-ydl_opts = {
-    "format": "bestaudio/best",
-    "outtmpl": "%(title)s.%(ext)s",
-    "postprocessors": [
-        {
-            "key": "FFmpegExtractAudio",
-            "preferredcodec": "mp3",
-            #"preferredquality": "320",
-        }
-    ],
-    "logger": MyLogger(),
-    "progress_hooks": [],
-}
+# Function to handle playlists
+def download_playlist(playlist_url):
+    # Create a temporary directory to fetch playlist metadata
+    temp_opts = {
+        'quiet': True,
+        'extract_flat': True,  # Extract metadata only, don't download
+    }
+
+    # Extract playlist metadata to get the playlist title
+    with yt_dlp.YoutubeDL(temp_opts) as temp_ydl:
+        playlist_info = temp_ydl.extract_info(playlist_url, download=False)
+        playlist_title = playlist_info.get('title', 'Playlist')
+
+    # Remove any invalid characters for folder names
+    playlist_title = re.sub(r'[<>:"/\\|?*]', '', playlist_title)
+
+    # Create a folder for the playlist in the Downloads folder
+    playlist_folder = os.path.join(download_folder, playlist_title)
+    try:
+        if not os.path.exists(playlist_folder):
+            os.makedirs(playlist_folder)
+    except OSError as e:
+        print(f"Failed to create directory {playlist_folder}: {e}")
+        sys.exit(1)
+
+    # Set download options for the playlist
+    ydl_opts_playlist = {
+        "format": "bestaudio/best",
+        "outtmpl": os.path.join(playlist_folder, '%(playlist_index)s - %(title)s.%(ext)s'),
+        "postprocessors": [
+            {
+                "key": "FFmpegExtractAudio",
+                "preferredcodec": "mp3",
+            }
+        ],
+        "logger": MyLogger(),
+        "progress_hooks": [],
+        "noplaylist": False  # Ensure the entire playlist is downloaded
+    }
+
+    # Download the playlist
+    with CustomYoutubeDL(ydl_opts_playlist) as ydl:
+        ydl.download([playlist_url])
+
+# Function to handle single videos
+def download_video(video_url):
+    ydl_opts_video = {
+        "format": "bestaudio/best",
+        "outtmpl": os.path.join(download_folder, '%(title)s.%(ext)s'),
+        "postprocessors": [
+            {
+                "key": "FFmpegExtractAudio",
+                "preferredcodec": "mp3",
+            }
+        ],
+        "logger": MyLogger(),
+        "progress_hooks": [],
+    }
+
+    # Download the video
+    with CustomYoutubeDL(ydl_opts_video) as ydl:
+        ydl.download([video_url])
 
 # Record the start time
 start = time.time()
 
-# Get the youtube video URL from the command-line arguments
+# Get the youtube video or playlist URL from the command-line arguments
 if len(sys.argv) != 2:
-    print("Usage: python youtube_to_mp3.py [youtube_video_url]")
+    print("Usage: python youtube_to_mp3.py [youtube_video_or_playlist_url]")
     sys.exit(1)
 
 video_url = sys.argv[1]
 
 print("\nDownloading..\n")
-# Download the youtube video as an mp3
-with CustomYoutubeDL(ydl_opts) as ydl:
-    ydl.download([video_url])
+
+# Check if the URL is a playlist (check for 'list=' in the URL)
+if 'list=' in video_url:
+    download_playlist(video_url)
+else:
+    download_video(video_url)
 
 # Record the end time and calculate the total time taken
 end = time.time()
