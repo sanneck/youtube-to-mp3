@@ -134,7 +134,7 @@ start = time.time()
 
 # Get the youtube video or playlist URL from the command-line arguments
 if len(sys.argv) != 2:
-    print("Usage: python youtube_to_mp3.py [youtube_video_or_playlist_url]")
+    print("Usage: python youtube_to_mp3.py '[youtube_video_or_playlist_url]'")
     sys.exit(1)
 
 video_url = sys.argv[1]
